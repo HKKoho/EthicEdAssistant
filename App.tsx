@@ -13,7 +13,7 @@ const App: React.FC = () => {
 
   // Load user from storage if exists
   useEffect(() => {
-    const savedUser = localStorage.getItem('wisdom_prism_user');
+    const savedUser = localStorage.getItem('ethics_explorer_user');
     if (savedUser) {
       try {
         const parsed = JSON.parse(savedUser);
@@ -26,7 +26,7 @@ const App: React.FC = () => {
 
   const handleLogin = (newUser: User) => {
     setUser(newUser);
-    localStorage.setItem('wisdom_prism_user', JSON.stringify(newUser));
+    localStorage.setItem('ethics_explorer_user', JSON.stringify(newUser));
   };
 
   const handleModuleSelect = (module: Module) => {
@@ -47,7 +47,7 @@ const App: React.FC = () => {
 
   const handleLogout = () => {
     setUser(null);
-    localStorage.removeItem('wisdom_prism_user');
+    localStorage.removeItem('ethics_explorer_user');
   };
 
   return (
@@ -57,10 +57,10 @@ const App: React.FC = () => {
       {user && (
         <div className="mb-6 flex justify-between items-center text-xs text-slate-400">
           <div className="flex items-center space-x-2">
-            <span className="bg-amber-100 text-amber-700 px-2 py-0.5 rounded font-bold">學員</span>
+            <span className="bg-amber-100 text-amber-700 px-2 py-0.5 rounded font-bold">Student 學生</span>
             <span className="font-medium text-slate-600">{user.name}</span>
           </div>
-          <button onClick={handleLogout} className="hover:text-amber-600 transition-colors underline">登出 / 更換學員</button>
+          <button onClick={handleLogout} className="hover:text-amber-600 transition-colors underline">Logout 登出</button>
         </div>
       )}
 

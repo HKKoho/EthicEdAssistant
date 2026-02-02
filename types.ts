@@ -1,12 +1,12 @@
 
 export enum PerspectiveType {
-  ORDER = 'PROVERBS',     // 箴言：理應如何
-  VANITY = 'ECCLESIASTES', // 傳道書：實際常如何
-  COLLAPSE = 'JOB'        // 約伯記：有時完全崩潰
+  VIRTUE = 'VIRTUE',           // 德性倫理 Virtue Ethics
+  DUTY = 'DUTY',               // 義務倫理 Duty Ethics
+  CONSEQUENCE = 'CONSEQUENCE'  // 後果倫理 Consequentialism
 }
 
-export interface ScripturePoint {
-  book: string;
+export interface EthicalPerspective {
+  tradition: string;
   theme: string;
   description: string;
 }
@@ -22,7 +22,7 @@ export interface Module {
   title: string;
   subtitle: string;
   lifeQuestions: string[];
-  perspectives: Record<PerspectiveType, ScripturePoint>;
+  perspectives: Record<PerspectiveType, EthicalPerspective>;
   tensionGuide: string;
   discussionPrompts: string[];
   summary: string;
