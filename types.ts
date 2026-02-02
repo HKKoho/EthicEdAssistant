@@ -13,6 +13,7 @@ export interface EthicalPerspective {
 
 export interface User {
   name: string;
+  role: 'admin' | 'student';
   loginTime: Date;
 }
 

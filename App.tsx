@@ -57,7 +57,11 @@ const App: React.FC = () => {
       {user && (
         <div className="mb-6 flex justify-between items-center text-xs text-slate-400">
           <div className="flex items-center space-x-2">
-            <span className="bg-amber-100 text-amber-700 px-2 py-0.5 rounded font-bold">Student 學生</span>
+            {user.role === 'admin' ? (
+              <span className="bg-slate-800 text-white px-2 py-0.5 rounded font-bold">Admin 管理員</span>
+            ) : (
+              <span className="bg-amber-100 text-amber-700 px-2 py-0.5 rounded font-bold">Student 學生</span>
+            )}
             <span className="font-medium text-slate-600">{user.name}</span>
           </div>
           <button onClick={handleLogout} className="hover:text-amber-600 transition-colors underline">Logout 登出</button>
