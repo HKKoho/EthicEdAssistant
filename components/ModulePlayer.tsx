@@ -8,6 +8,7 @@ import TextToSpeechButton from './TextToSpeechButton';
 import ClassInsight from './ClassInsight';
 import { useLanguage } from '../i18n';
 import { splitBilingual } from '../contentUtils';
+import { saveStudentProgress, isSupabaseConfigured } from '../services/supabaseService';
 
 interface ModulePlayerProps {
   module: Module;
@@ -40,8 +41,28 @@ const ModulePlayer: React.FC<ModulePlayerProps> = ({ module, onComplete }) => {
     };
   }, [t]);
 
+  const studentName = (() => {
+    try {
+      const u = JSON.parse(localStorage.getItem('ethics_explorer_user') || '{}');
+      return u.name || 'Unknown';
+    } catch { return 'Unknown'; }
+  })();
+
+  const persistProgress = (step: string, completed = false) => {
+    if (!isSupabaseConfigured()) return;
+    saveStudentProgress({
+      student_name: studentName,
+      module_id: module.id,
+      step,
+      user_inputs: userInputs,
+      ai_feedback: aiFeedback,
+      completed,
+    });
+  };
+
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
+    persistProgress(currentStep);
   }, [currentStep]);
 
   const handleInputChange = (key: string, value: string) => {
@@ -138,7 +159,7 @@ const ModulePlayer: React.FC<ModulePlayerProps> = ({ module, onComplete }) => {
       case 'LIFE_QUESTION':
         return (
           <div className="space-y-8 animate-fadeIn">
-            <div className="bg-orange-50 border-l-4 border-orange-400 p-6 rounded-r-lg">
+            <div className="bg-orange-50/80 border-l-4 border-orange-400 p-6 rounded-r-lg backdrop-blur-sm">
               <div className="flex justify-between items-start mb-4">
                 <h3 className="text-xl font-bold text-orange-900">{t('player.step1')}</h3>
                 <AudioNarration text={narrationText} />
@@ -262,10 +283,10 @@ const ModulePlayer: React.FC<ModulePlayerProps> = ({ module, onComplete }) => {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {(Object.entries(module.perspectives) as [PerspectiveType, EthicalPerspective][]).map(([type, point]) => (
-                <div key={type} className={`p-6 rounded-2xl border transition-all flex flex-col justify-between ${
-                  type === PerspectiveType.VIRTUE ? 'bg-orange-50 border-orange-200' :
+                <div key={type} className={`p-6 rounded-2xl border transition-all flex flex-col justify-between backdrop-blur-sm ${
+                  type === PerspectiveType.VIRTUE ? 'bg-orange-50/80 border-orange-200' :
                   type === PerspectiveType.DUTY ? 'bg-orange-50/70 border-orange-100' :
-                  'bg-orange-50/50 border-orange-100'
+                  'bg-orange-50/60 border-orange-100'
                 }`}>
                   <div>
                     <span className={`text-[10px] font-bold uppercase tracking-widest px-2 py-1 rounded mb-4 inline-block ${
@@ -303,7 +324,7 @@ const ModulePlayer: React.FC<ModulePlayerProps> = ({ module, onComplete }) => {
               <h3 className="text-2xl font-bold text-slate-800">{t('player.step3')}</h3>
               <AudioNarration text={narrationText} />
             </div>
-            <div className="bg-orange-50 border-2 border-orange-200 p-6 md:p-10 rounded-3xl shadow-sm">
+            <div className="bg-orange-50/80 border-2 border-orange-200 p-6 md:p-10 rounded-3xl shadow-sm backdrop-blur-sm">
               <div className="mb-8">
                 <h4 className="text-2xl font-bold text-slate-900 flex items-center mb-1">
                   <svg className="w-6 h-6 mr-3 text-orange-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -335,7 +356,7 @@ const ModulePlayer: React.FC<ModulePlayerProps> = ({ module, onComplete }) => {
             </div>
             <div className="space-y-6">
               {module.discussionPrompts.map((prompt, idx) => (
-                <div key={idx} className="bg-orange-50 p-6 rounded-2xl border border-orange-200 shadow-sm">
+                <div key={idx} className="bg-orange-50/80 p-6 rounded-2xl border border-orange-200 shadow-sm backdrop-blur-sm">
                   <div className="flex justify-between items-start mb-4">
                     <p className="text-lg font-bold text-slate-800 flex-grow pr-4">{splitBilingual(prompt, lang)}</p>
                     <SpeechInputButton
@@ -366,7 +387,7 @@ const ModulePlayer: React.FC<ModulePlayerProps> = ({ module, onComplete }) => {
                 <h3 className="text-2xl font-bold text-slate-800">{t('player.step5')}</h3>
                 <AudioNarration text={narrationText} />
               </div>
-              <div className="bg-slate-900 text-white p-10 rounded-3xl shadow-2xl">
+              <div className="bg-slate-900/80 text-white p-10 rounded-3xl shadow-2xl backdrop-blur-sm">
                 <p className="text-2xl font-bold mb-6 serif leading-relaxed">
                   「{splitBilingual(module.summary, lang)}」
                 </p>
@@ -387,7 +408,7 @@ const ModulePlayer: React.FC<ModulePlayerProps> = ({ module, onComplete }) => {
                 />
               </div>
               <button
-                onClick={onComplete}
+                onClick={() => { persistProgress('SUMMARY', true); onComplete(); }}
                 className="mt-8 bg-orange-600 text-white px-12 py-4 rounded-full hover:bg-orange-700 transition-all font-bold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1"
               >
                 {t('player.completeLesson')}
@@ -446,7 +467,7 @@ const ModulePlayer: React.FC<ModulePlayerProps> = ({ module, onComplete }) => {
         })}
       </div>
 
-      <div className="min-h-[500px] bg-white rounded-3xl p-6 md:p-10 shadow-sm border border-slate-100">
+      <div className="min-h-[500px] bg-white/80 rounded-3xl p-6 md:p-10 shadow-sm border border-slate-100 backdrop-blur-sm">
         {renderStep()}
       </div>
     </div>

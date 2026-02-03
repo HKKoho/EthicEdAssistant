@@ -41,7 +41,7 @@ const translations: Record<string, Record<Lang, string>> = {
   'app.beforeClass': { en: 'Before Class', zh: '課前準備' },
   'app.onClass': { en: 'In Class', zh: '課堂學習' },
   'app.logout': { en: 'Logout', zh: '登出' },
-  'app.aiAssistant': { en: 'AI Assistant', zh: 'AI 助手' },
+  'app.aiAssistant': { en: 'Wednesday', zh: 'Wednesday' },
 
   // ModuleList
   'moduleList.heading': { en: '24 Ethics Lessons', zh: '24 倫理課程' },
@@ -111,8 +111,8 @@ const translations: Record<string, Record<Lang, string>> = {
   'editor.cancel': { en: 'Cancel', zh: '取消' },
 
   // TeachingAssistant
-  'ta.beforeClassLabel': { en: 'Before Class Assistant', zh: '課前助手' },
-  'ta.onClassLabel': { en: 'In Class Assistant', zh: '課堂助手' },
+  'ta.beforeClassLabel': { en: 'Wednesday', zh: 'Wednesday' },
+  'ta.onClassLabel': { en: 'Wednesday', zh: 'Wednesday' },
   'ta.poweredBy': { en: 'Powered by GPT-5', zh: '由 GPT-5 驅動' },
   'ta.beforeClassEmpty1': { en: 'How can I help you prepare?', zh: '我可以幫你準備什麼？' },
   'ta.beforeClassEmpty2': { en: 'Ask me to help plan a lesson, suggest activities, or explain ethical concepts.', zh: '我可以幫你準備課程、建議活動或解釋倫理概念。' },
@@ -143,6 +143,36 @@ const translations: Record<string, Record<Lang, string>> = {
 
   // WordCloud
   'wordCloud.empty': { en: 'Collecting classmate responses...', zh: '正在收集同學的回應中...' },
+
+  // Sidebar
+  'sidebar.content': { en: 'Content Management', zh: '內容管理' },
+  'sidebar.wednesday': { en: 'Wednesday', zh: 'Wednesday' },
+  'sidebar.studentWednesday': { en: 'Student & Wednesday', zh: '學生與Wednesday' },
+  'sidebar.teacherStudents': { en: 'Teacher & Students', zh: '教師與學生' },
+  'sidebar.progress': { en: 'Student Progress', zh: '學生進度' },
+  'sidebar.analysis': { en: 'Analysis', zh: '分析' },
+  'sidebar.assignments': { en: 'Assignments', zh: '作業' },
+
+  // Placeholders
+  'placeholder.comingSoon': { en: 'Coming Soon', zh: '即將推出' },
+  'placeholder.studentWednesdayDesc': { en: 'View conversations between students and Wednesday AI assistant.', zh: '查看學生與Wednesday AI助手之間的對話。' },
+  'placeholder.teacherStudentsDesc': { en: 'Interact with students during lessons.', zh: '在課堂中與學生互動。' },
+  'placeholder.analysisDesc': { en: 'View analytics and insights about student learning.', zh: '查看學生學習分析和洞察。' },
+  'placeholder.assignmentsDesc': { en: 'Create and manage student assignments.', zh: '創建和管理學生作業。' },
+
+  // Student Progress
+  'progress.title': { en: 'Student Progress', zh: '學生進度' },
+  'progress.loading': { en: 'Loading progress data...', zh: '正在載入進度數據...' },
+  'progress.noSupabase': { en: 'Please configure Supabase to view student progress.', zh: '請配置Supabase以查看學生進度。' },
+  'progress.recordsTotal': { en: 'records', zh: '筆記錄' },
+  'progress.empty': { en: 'No student progress recorded yet.', zh: '尚無學生進度記錄。' },
+  'progress.colStudent': { en: 'Student', zh: '學生' },
+  'progress.colModule': { en: 'Lesson', zh: '課程' },
+  'progress.colStep': { en: 'Step', zh: '步驟' },
+  'progress.colStatus': { en: 'Status', zh: '狀態' },
+  'progress.colUpdated': { en: 'Updated', zh: '更新時間' },
+  'progress.completed': { en: 'Completed', zh: '已完成' },
+  'progress.inProgress': { en: 'In Progress', zh: '進行中' },
 };
 
 const LanguageContext = createContext<LanguageContextType>({

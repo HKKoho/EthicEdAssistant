@@ -3,8 +3,8 @@ import React, { useState, useEffect } from 'react';
 import Layout from './components/Layout';
 import ModuleList from './components/ModuleList';
 import ModulePlayer from './components/ModulePlayer';
-import AdminDashboard from './components/AdminDashboard';
 import TeachingAssistant from './components/TeachingAssistant';
+import BeforeClassLayout from './components/BeforeClassLayout';
 import Login from './components/Login';
 import { Module, User } from './types';
 import { MODULES } from './constants';
@@ -104,10 +104,10 @@ const AppContent: React.FC = () => {
       )}
 
       {user && isAdmin && (
-        <AdminDashboard
+        <BeforeClassLayout
           modules={modules}
-          onSave={handleSaveModule}
-          onDelete={handleDeleteModule}
+          onSaveModule={handleSaveModule}
+          onDeleteModule={handleDeleteModule}
         />
       )}
 
@@ -125,8 +125,8 @@ const AppContent: React.FC = () => {
         )
       )}
 
-      {/* Floating AI Teaching Assistant Button */}
-      {user && (
+      {/* Floating AI Teaching Assistant Button (students only) */}
+      {user && !isAdmin && (
         <button
           onClick={() => setShowAssistant(true)}
           className="fixed bottom-6 right-6 z-[150] bg-orange-500 hover:bg-orange-600 text-white w-14 h-14 rounded-full shadow-lg hover:shadow-xl transition-all flex items-center justify-center group"
@@ -144,8 +144,8 @@ const AppContent: React.FC = () => {
         </button>
       )}
 
-      {/* AI Teaching Assistant Chat */}
-      {user && showAssistant && (
+      {/* AI Teaching Assistant Chat (students only) */}
+      {user && !isAdmin && showAssistant && (
         <TeachingAssistant
           mode={isAdmin ? 'before-class' : 'on-class'}
           onClose={() => setShowAssistant(false)}
