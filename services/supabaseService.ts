@@ -1,16 +1,19 @@
 
-import { createClient } from '@supabase/supabase-js';
+import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { Module, Cycle } from '../types';
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+export const supabase: SupabaseClient | null = supabaseUrl && supabaseAnonKey
+  ? createClient(supabaseUrl, supabaseAnonKey)
+  : null;
 
-export const isSupabaseConfigured = () => !!supabaseUrl && !!supabaseAnonKey;
+export const isSupabaseConfigured = () => !!supabase;
 
 // --- Cycles ---
 export const getCycles = async (): Promise<Cycle[]> => {
+  if (!supabase) return [];
   const { data, error } = await supabase.from('cycles').select('*').order('id');
   if (error) { console.error('getCycles error:', error); return []; }
   return data || [];
@@ -18,6 +21,7 @@ export const getCycles = async (): Promise<Cycle[]> => {
 
 // --- Modules ---
 export const getModules = async (): Promise<Module[]> => {
+  if (!supabase) return [];
   const { data, error } = await supabase.from('modules').select('*').order('id');
   if (error) { console.error('getModules error:', error); return []; }
   return (data || []).map(row => ({
@@ -34,6 +38,7 @@ export const getModules = async (): Promise<Module[]> => {
 };
 
 export const saveModule = async (module: Module): Promise<boolean> => {
+  if (!supabase) return false;
   const row = {
     id: module.id,
     cycle_id: module.cycleId,
@@ -51,6 +56,7 @@ export const saveModule = async (module: Module): Promise<boolean> => {
 };
 
 export const deleteModule = async (id: number): Promise<boolean> => {
+  if (!supabase) return false;
   const { error } = await supabase.from('modules').delete().eq('id', id);
   if (error) { console.error('deleteModule error:', error); return false; }
   return true;
@@ -70,7 +76,7 @@ export interface StudentProgressRecord {
 }
 
 export const saveStudentProgress = async (data: Omit<StudentProgressRecord, 'id' | 'created_at' | 'updated_at'>): Promise<boolean> => {
-  // Upsert by student_name + module_id
+  if (!supabase) return false;
   const { error } = await supabase
     .from('student_progress')
     .upsert(
@@ -82,12 +88,14 @@ export const saveStudentProgress = async (data: Omit<StudentProgressRecord, 'id'
 };
 
 export const getStudentProgress = async (): Promise<StudentProgressRecord[]> => {
+  if (!supabase) return [];
   const { data, error } = await supabase.from('student_progress').select('*').order('updated_at', { ascending: false });
   if (error) { console.error('getStudentProgress error:', error); return []; }
   return data || [];
 };
 
 export const getProgressByModule = async (moduleId: number): Promise<StudentProgressRecord[]> => {
+  if (!supabase) return [];
   const { data, error } = await supabase.from('student_progress').select('*').eq('module_id', moduleId);
   if (error) { console.error('getProgressByModule error:', error); return []; }
   return data || [];
