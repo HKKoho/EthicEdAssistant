@@ -1,5 +1,6 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
+import { useLanguage } from '../i18n';
 
 interface SpeechInputButtonProps {
   onTranscript: (text: string) => void;
@@ -7,6 +8,7 @@ interface SpeechInputButtonProps {
 }
 
 const SpeechInputButton: React.FC<SpeechInputButtonProps> = ({ onTranscript, className = "" }) => {
+  const { lang, t } = useLanguage();
   const [isListening, setIsListening] = useState(false);
   const [isSupported, setIsSupported] = useState(false);
 
@@ -27,7 +29,7 @@ const SpeechInputButton: React.FC<SpeechInputButtonProps> = ({ onTranscript, cla
     if (!Recognition) return;
 
     const recognition = new Recognition();
-    recognition.lang = 'zh-TW';
+    recognition.lang = lang === 'en' ? 'en-US' : 'zh-TW';
     recognition.interimResults = false;
     recognition.maxAlternatives = 1;
 
@@ -51,7 +53,7 @@ const SpeechInputButton: React.FC<SpeechInputButtonProps> = ({ onTranscript, cla
     };
 
     recognition.start();
-  }, [isListening, onTranscript]);
+  }, [isListening, onTranscript, lang]);
 
   if (!isSupported) return null;
 
@@ -60,11 +62,11 @@ const SpeechInputButton: React.FC<SpeechInputButtonProps> = ({ onTranscript, cla
       type="button"
       onClick={toggleListening}
       className={`p-2 rounded-full transition-all duration-300 flex items-center justify-center ${
-        isListening 
-          ? 'bg-red-500 text-white animate-pulse shadow-lg scale-110' 
+        isListening
+          ? 'bg-red-500 text-white animate-pulse shadow-lg scale-110'
           : 'bg-slate-200 text-slate-600 hover:bg-slate-300'
       } ${className}`}
-      title={isListening ? "正在聆聽...點擊停止" : "點擊使用語音輸入"}
+      title={isListening ? t('speech.listening') : t('speech.clickToSpeak')}
     >
       {isListening ? (
         <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">

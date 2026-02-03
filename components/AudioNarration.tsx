@@ -1,6 +1,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { generateSpeech } from '../services/geminiService';
+import { useLanguage } from '../i18n';
 
 interface AudioNarrationProps {
   text: string;
@@ -8,16 +9,16 @@ interface AudioNarrationProps {
 }
 
 const AudioNarration: React.FC<AudioNarrationProps> = ({ text, autoPlay = false }) => {
+  const { lang, t } = useLanguage();
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [volume, setVolume] = useState(0.8);
-  
+
   const audioContextRef = useRef<AudioContext | null>(null);
   const sourceRef = useRef<AudioBufferSourceNode | null>(null);
   const gainNodeRef = useRef<GainNode | null>(null);
   const audioBufferRef = useRef<AudioBuffer | null>(null);
 
-  // Helper: Base64 to Uint8Array
   const decodeBase64 = (base64: string) => {
     const binaryString = atob(base64);
     const len = binaryString.length;
@@ -28,7 +29,6 @@ const AudioNarration: React.FC<AudioNarrationProps> = ({ text, autoPlay = false 
     return bytes;
   };
 
-  // Helper: Decode raw PCM to AudioBuffer
   const decodeAudioData = async (
     data: Uint8Array,
     ctx: AudioContext,
@@ -59,21 +59,18 @@ const AudioNarration: React.FC<AudioNarrationProps> = ({ text, autoPlay = false 
   };
 
   const playAudio = async (startFromBeginning: boolean = false) => {
-    // If already playing and not a replay, treat as stop request
     if (isPlaying && !startFromBeginning) {
       stopAudio();
       return;
     }
 
-    // If replaying, stop existing playback first
     if (startFromBeginning && isPlaying) {
       stopAudio();
     }
 
-    // Fetch audio if not cached or if text changed
     if (!audioBufferRef.current) {
       setIsLoading(true);
-      const base64Audio = await generateSpeech(text);
+      const base64Audio = await generateSpeech(text, lang);
       if (base64Audio) {
         if (!audioContextRef.current) {
           audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
@@ -84,18 +81,17 @@ const AudioNarration: React.FC<AudioNarrationProps> = ({ text, autoPlay = false 
       setIsLoading(false);
     }
 
-    // Play cached buffer
     if (audioBufferRef.current && audioContextRef.current) {
       const source = audioContextRef.current.createBufferSource();
       source.buffer = audioBufferRef.current;
-      
+
       const gainNode = audioContextRef.current.createGain();
       gainNode.gain.value = volume;
       gainNodeRef.current = gainNode;
 
       source.connect(gainNode);
       gainNode.connect(audioContextRef.current.destination);
-      
+
       source.onended = () => {
         setIsPlaying(false);
         sourceRef.current = null;
@@ -122,7 +118,6 @@ const AudioNarration: React.FC<AudioNarrationProps> = ({ text, autoPlay = false 
     return () => stopAudio();
   }, []);
 
-  // Reset cache and stop audio when text context changes
   useEffect(() => {
     stopAudio();
     audioBufferRef.current = null;
@@ -135,12 +130,12 @@ const AudioNarration: React.FC<AudioNarrationProps> = ({ text, autoPlay = false 
           onClick={() => playAudio(false)}
           disabled={isLoading}
           className={`w-9 h-9 rounded-full flex items-center justify-center transition-all ${
-            isPlaying ? 'bg-amber-500 text-white' : 'bg-white text-slate-700 hover:bg-amber-50'
+            isPlaying ? 'bg-orange-500 text-white' : 'bg-white text-slate-700 hover:bg-orange-50'
           } ${isLoading ? 'opacity-50' : 'hover:scale-105 active:scale-95'}`}
-          title={isPlaying ? "停止朗讀" : "播放朗讀"}
+          title={isPlaying ? t('audio.stop') : t('audio.play')}
         >
           {isLoading ? (
-            <div className="w-4 h-4 border-2 border-amber-500 border-t-transparent rounded-full animate-spin"></div>
+            <div className="w-4 h-4 border-2 border-orange-500 border-t-transparent rounded-full animate-spin"></div>
           ) : isPlaying ? (
             <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zM7 8a1 1 0 012 0v4a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v4a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" /></svg>
           ) : (
@@ -151,8 +146,8 @@ const AudioNarration: React.FC<AudioNarrationProps> = ({ text, autoPlay = false 
         <button
           onClick={handleReplay}
           disabled={isLoading}
-          className={`w-9 h-9 rounded-full flex items-center justify-center transition-all bg-white text-slate-700 hover:bg-amber-50 ${isLoading ? 'opacity-50' : 'hover:scale-105 active:scale-95'}`}
-          title="重新播放"
+          className={`w-9 h-9 rounded-full flex items-center justify-center transition-all bg-white text-slate-700 hover:bg-orange-50 ${isLoading ? 'opacity-50' : 'hover:scale-105 active:scale-95'}`}
+          title={t('audio.replay')}
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5">
             <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
@@ -169,10 +164,10 @@ const AudioNarration: React.FC<AudioNarrationProps> = ({ text, autoPlay = false 
           step="0.1"
           value={volume}
           onChange={(e) => setVolume(parseFloat(e.target.value))}
-          className="w-16 h-1 bg-slate-300 rounded-lg appearance-none cursor-pointer accent-amber-500"
+          className="w-16 h-1 bg-slate-300 rounded-lg appearance-none cursor-pointer accent-orange-500"
         />
       </div>
-      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter pr-3 hidden lg:inline">智慧語音</span>
+      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter pr-3 hidden lg:inline">{t('audio.label')}</span>
     </div>
   );
 };

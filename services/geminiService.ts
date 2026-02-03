@@ -46,18 +46,22 @@ export const getWisdomAssistantResponse = async (
  * Generates audio narration for a given text using gemini-2.5-flash-preview-tts
  * Returns base64 encoded PCM data.
  */
-export const generateSpeech = async (text: string): Promise<string | undefined> => {
+export const generateSpeech = async (text: string, lang: 'en' | 'zh' = 'en'): Promise<string | undefined> => {
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+
+  const langPrompt = lang === 'en'
+    ? `Please read the following content ONLY in English, in a warm, clear, and encouraging tone suitable for students. Ignore any Chinese characters and do not read them: ${text}`
+    : `請用繁體中文朗讀以下內容，語氣溫暖、清晰、鼓勵，適合學生聆聽。忽略所有英文內容，只朗讀中文部分: ${text}`;
 
   try {
     const response = await ai.models.generateContent({
       model: "gemini-2.5-flash-preview-tts",
-      contents: [{ parts: [{ text: `Please read the following content in a warm, clear, and encouraging tone suitable for students: ${text}` }] }],
+      contents: [{ parts: [{ text: langPrompt }] }],
       config: {
         responseModalities: [Modality.AUDIO],
         speechConfig: {
           voiceConfig: {
-            prebuiltVoiceConfig: { voiceName: 'Kore' },
+            prebuiltVoiceConfig: { voiceName: lang === 'en' ? 'Kore' : 'Kore' },
           },
         },
       },
